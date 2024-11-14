@@ -1,14 +1,10 @@
-### Econometria I - Professora Susan Schommer
+##########################################################################################################
+#----------------------- TUTORIA - ECONOMETRIA I - PROF. SUSAN SCHOMMER ------------------------
+##########################################################################################################
 
-### Tutoria 2
+## Tutoria 2: Dummy e Teste de Hipotese
 
-
-
-
-######################### Regressao multipla, dummys e testes de significancia 
-
-#####################################################################################################################
-#####################################################################################################################
+## Adaptado a partir de script elaborado por Ana Coelho
 
 #_________________________Preparando ambiente __________________________________
 
@@ -23,7 +19,7 @@ setwd("C:/Users/.../Documents/.../Tutoria - Econometria/Tutoria 2")
 
 # Utilizaremos os seguintes pacotes: wooldridge, ggplot2
 
-# Hoje vamos usar a base do Wooldridge 
+# Vamos usar a base do Wooldridge 
 
 # ggplot2: pacote para fazer gráficos mais elaborados do que aqueles com o comando plot do R-base
 
@@ -38,6 +34,7 @@ install.packages("ggplot2")
 
 library(wooldridge)
 library(ggplot2)
+library(tidyverse)
 
 
 
@@ -53,7 +50,7 @@ View(dados) # Visualisando a base de dados para verificar o número de observaç
 
 # Mais variáveis e mais observações em comparação com a base de dados da tutoria passada
 
-# Cada observacao representa uma pessoa da nossa amostra de pessoas da forca de trabalho dos EUA em 1976
+# Cada observacao representa uma pessoa da nossa amostra do mercado de trabalho dos EUA em 1976
 
 # Analisando média e desvio-padrão de algumas das variáveis que vamos usar:
 
@@ -68,7 +65,7 @@ median(dados$educ)
 ####################################################################################################################
 ####################################################################################################################
 
-# Queremos estimar o segunte modelo: salario = B0 + B1*educ + BiXi + u, Xi: outras variaveis explicativas
+# Queremos estimar o segunte modelo: salario = B0 + B1*educ + BiXi + u, Xi= outras variaveis explicativas
 
 #_______________________ Revisao________________________________________________
   
@@ -77,7 +74,7 @@ median(dados$educ)
 
 # Visualizando graficamente a reta de regressao:
 
-# "A construção de gráficos com o ggplot2 é como construir uma escultura de Lego, no sentido de que o gráfico a ser construído é composto de 'blocos' que são empilhados"
+# Um grafico feito com o ggplot2 é composto de 'blocos' que são empilhados
 # "+" indica que haverá uma continuação nas instruções
 
 reta_reg <- ggplot(data = dados,aes(x=educ, y=wage)) + # em data indicamos quais dados queremos usar no gráfico e aes indica os argumentos dos eixos x e y
@@ -87,21 +84,23 @@ reta_reg <- ggplot(data = dados,aes(x=educ, y=wage)) + # em data indicamos quais
 
 reta_reg # visualizando o gráfico 
 
-# para cada nível de escolaridade na amostra, temos diversos valores de salários: não é uma relaçao deterministica
+# Salvando o grafico em formato pdf dentro da pasta "Graficos" do projeto
+
+ggsave(filename = "Graficos/reta_reg.pdf", plot = reta_reg)
+
+# para cada nível de escolaridade na amostra, temos diversos valores de salários: nao é uma relaçao deterministica
 
 # a reta de regressão me diz qual seria o valor esperado do salario por anos de escolaridade,
 
-# isto é, dado n anos de educacao, espera-se ganhar um salário de $y. Note que este valor,
+# isto é, dado n anos de educacao, espera-se ganhar um salário de y dolares. 
     
-# é em MEDIA: para um nivel de escolaridade x, na realidade existem pessoas com diferentes salarios.
+# Note que este valor é em MEDIA: para um nivel de escolaridade x, na realidade existem pessoas com diferentes salarios.
 
 # temos a média do salário como uma função de escolaridade e o salário médio varia positivamente em relaçao aos anos de escolaridade
 
-# Se para cada x, a dispersao é muito grande (ou existem outliers), entao nossas estimativas podem 
-    
-# ser viesadas para cima ou para baixo.
+# Se para cada x, a dispersao é muito grande (ou existem outliers), entao nossas estimativas podem ser viesadas para cima ou para baixo.
 
-
+# Rodando a regressao simples de salario em escolaridade:
 
 reg_simples <- lm(wage~educ, data = dados)
 summary(reg_simples)
@@ -110,11 +109,9 @@ summary(reg_simples)
 
 # b1= 0.54136
 
-# para 1 ano a mais de escolaridade é previsto um aumento no salário-hora de, em média, $0.54.
+# 1 ano a mais de escolaridade está associado a um aumento no salário-hora de, em média, $0.54.
 
 #__________________ Unidades de medida: (wooldridge, cap 2, secao 2.4)__________
-
-
 
 # E se o salario estivesse em log?
 
@@ -124,12 +121,23 @@ summary(reg_simples)
 
 # Uma caracterização melhor de como o salário muda com o nível de escolaridade é que cada ano de educação aumenta o salário em uma porcentagem constante
 
+# Isso implica uma relação log-linear entre salário e escolaridade.
+
 # Vamos usar agora como y o log do salário-hora (já presente da base de dados)
 
-reg_simples_lny <- lm(lwage~educ, data = dados)
-summary(reg_simples_lny)
+# Mas se nao tivesse lwage na base, poderiamos fazer:
+
+dados <- dados %>%
+  mutate(lwage_2=log(wage)) # mutate adiciona a nova variavel log(wage) na base
+
+# Vamos repetir a regressao simples, agora com log(wage):
+
+reg_simples_lwage <- lm(lwage~educ, data = dados)
+summary(reg_simples_lwage)
 
 # b1 = 0.082744
+
+# Cada ano a mais de escolaridade esta associado a um aumento de, em media, 8% no salario-hora
 
 # variacao % wage = 100*b1
 
@@ -177,6 +185,10 @@ aggregate(wage ~ female, data = dados, FUN = "mean") # FUN indica qual estatíst
 
 # Comparar com a média da amostra total que obtivemos anteriormente
 
+mean(dados$wage) # 5.896103
+
+# A media salarial das mulheres esta abaixo da media amostral e a dos homens, acima
+
  
 # Calculando a diferenca da media salarial entre homens e mulheres
 
@@ -191,7 +203,7 @@ aggregate(wage ~ female, data = dados, FUN = "mean") # FUN indica qual estatíst
 # Forma 2- Usando Regressao:
 
 # Lembre que b0 é coef linear da regressao. No caso de uma variavel dummy, b1 assumira tambem esse papel,
-# isto é, se b1 é significativo, para a categoria = 1, entao o coeficiente linear sera dado por b0+b1.
+# isto é, se b1 é significativo para a categoria = 1, entao o coeficiente linear sera dado por b0+b1.
 
 
 # Modelo: wage = b0 + b1 female + u
@@ -220,13 +232,16 @@ summary(reg_genero)
 
 # Inspecao Grafica:
 
-ggplot(data = dados,aes(x = educ, y = wage,colour = factor(female))) + # indicamos que queremos que o gráfico tenha cores diferentes para as duas categorias da dummy
+wage_gender <- ggplot(data = dados,aes(x = educ, y = wage,colour = factor(female))) + # indicamos que queremos que o gráfico tenha cores diferentes para as duas categorias da dummy
       geom_point() 
-     
+
+
+ggsave(filename = "Graficos/wage_gender.pdf", plot = wage_gender)
+
 
 # O que acontece com a regressão de salário em educação se incluirmos a dummy de genero?
 
-reg_educ_genero <- lm(wage ~ female+educ, data = dados)
+reg_educ_genero <- lm(lwage ~ female+educ, data = dados)
 
 summary(reg_educ_genero)
 
@@ -234,22 +249,25 @@ summary(reg_educ_genero)
 
 # B1 indica se existe diferença salarial de genero
 
-# B1 = E(wage|female=1,educ)-E(wage|female=0,educ)= -2.27
+# B1 = E(lwage|female=1,educ)-E(lwage|female=0,educ)= -0.36
 
-# Interpretacao: 1 ano a mais de educ aumenta em media o salario em 0.5 dolares.
+# Ser mulher esta associado a um salario, em media, 36% menor comparado a homens, dado o mesmo grau de educacao.
 
-# Mulheres ganham, em media, 2.27 dolares a menos do que homens, dado o mesmo grau de educacao.
+# Dado o mesmo nivel de escolaridade, mulheres têm um salario esperado, em media, 36% menor do que os homens
 
-
-
-# Note que, graficamente, a dummie representa um deslocamento vertical da reta da regressao simples 
+# Note que, graficamente, a dummy representa um deslocamento vertical da reta da regressao simples 
 # (para baixo, no caso):
 # A diferenca entre os salarios nao depende da escolaridade: as retas de regressão sao paralelas, pois trata-se de um deslocamento do intercepto
 
 dados$wage_predict_1 <- predict(reg_educ_genero)
 
-ggplot(data = dados) + 
+reg_gender <- ggplot(data = dados) + 
     geom_line(aes(x = educ, y = wage_predict_1, colour = factor(female)))
+
+view(reg_gender)
+
+ggsave(filename = "Graficos/reg_gender.pdf", plot = reg_gender)
+
 
 # Qual o salario esperado dos homens e das mulheres nesse caso?
 
@@ -262,22 +280,32 @@ ggplot(data = dados) +
     
 # Poderiamos repetir o exercicio acima para os subgrupos de pessoas casadas nao-casadas na nossa amostra:
 
-ggplot(data = dados) + 
+wage_married <- ggplot(data = dados) + 
   geom_point(aes(x = educ, y = wage, colour = factor(married)))
 
-reg_married <- lm(wage ~ married + educ, data = dados)
+ggsave(filename = "Graficos/wage_married.pdf", plot = wage_married)
+
+
+reg_married <- lm(lwage ~ married + educ, data = dados)
 summary(reg_married)
 
-# Dado o mesmo nível de escolaridade, pessoas casadas ganham, em média, $1.52 a mais de salário-hora.
+# Dado o mesmo nível de escolaridade, pessoas casadas ganham, em média, 26% a mais do que pessoas nao-casadas.
 
-# E(wage|married=1,educ)-E(wage|married=0,educ) = 1.52
+# E(lwage|married=1,educ)-E(lwage|married=0,educ) = 0.26
 
 dados$wage_predict_2 <- predict(reg_married)
 
-ggplot(data = dados) + 
+reg_married <- ggplot(data = dados) + 
     geom_line(aes(x = educ, y = wage_predict_2, colour = factor(married)))
 
+ggsave(filename = "Graficos/reg_married.pdf", plot = reg_married)
+
+
 # Ser casado desloca para cima a reta de regressão (aumento do intercepto)
+
+# Casados: salario_m = b0 + b1 married + b2 educ
+
+# Nao-casados: salario_h = b0 + b2 educ
 
 # Em média, os salarios sao mais altos para o subgrupo de casados da amostra, controlado pela escolaridade
     
@@ -286,9 +314,16 @@ ggplot(data = dados) +
 
 # E se quisermos criar uma dummy para anos de escolaridade igual ou maior/menor a um certo valor? 
 
-# Ex: Dummy para saber se a pessoa tem o ensimo medio - 12 anos ou mais de escolaridade?
+# Ex: Dummy para saber se a pessoa tem ensino medio completo- 12 anos ou mais de escolaridade?
 
-dados$dummy_educ <- ifelse(dados$educ >= 12, 1, 0) # crio uma variavel dummy 
+  # Usando R Base: 
+
+  dados$dummy_educ <- ifelse(dados$educ >= 12, 1, 0) # crio uma variavel dummy 
+  
+  # Usando tidyverse:
+  
+  dados <- dados %>%
+            mutate(highschool= ifelse(educ >=12, 1, 0))
 
 # com dados$dummy_educ esta dummy é adicionada como uma nova variável no conjunto de dados
 
@@ -303,6 +338,10 @@ table(dados$dummy_educ) # Visualizando quantas observacoes têm 12< anos de educ
 # Exemplo: Se criamos dummies para 5 anos de educacao, 10 anos de educacao e de 12 anos ou mais, não podemos incluir todas as dummies
 
 # O intercepto do grupo-base (grupo cuja dummy está omitida) é o intercepto global do modelo e o coeficiente da dummy de cada grupo representa a diferença estimada entre este grupo e o grupo-base
+
+reg_highschool <- lm(lwage~highschool, dados)
+summary(reg_highschool)
+  # Pessoas com ensino medio completo ou mais anos de educacao tem salario esperado, em media, 39% maior
 
 ####################################################################################################################
 ####################################################################################################################
@@ -381,6 +420,8 @@ qf(p=0.05,df1=2,df2=523,lower.tail = FALSE)
 qf(p=0.01,df1=2,df2=523,lower.tail = FALSE)
 
 # 4.645959
+
+# Mas, como a estatistica F é muito grande, ainda rejeitamos H0
     
 # Outro modelo
     
@@ -431,9 +472,6 @@ table(dados_trabalho$numero_aluno) # Vemos quantas observacoes existem para cada
 
 # tidyverse é um pacote de manipulacao de dados que oferece solucoes mais simples do que o R base
     
-install.packages("tidyverse") # Caso ainda nao tenha instalado  
-library(tidyverse)
-
 # Coseguimos modificar os dados e filtrar somente os que precisamos com 2 linhas de codigo:
 
   dados_trabalho <- dados_trabalho %>%
@@ -448,7 +486,6 @@ library(tidyverse)
    dados_trabalho %>%
     filter(numero_aluno!=77) # Nao existe nenhuma observacao cujo numero-aluno seja diferente de 77
     
-    
-##############################################################################################################
-##############################################################################################################
+   ######################################################################################################################
+   ######################################################################################################################
 

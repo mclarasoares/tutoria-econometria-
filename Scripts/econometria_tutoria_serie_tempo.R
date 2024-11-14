@@ -1,10 +1,10 @@
-############################### Econometria I
+##########################################################################################################
+#----------------------- TUTORIA - ECONOMETRIA I - PROF. SUSAN SCHOMMER ------------------------
+##########################################################################################################
 
-### Prof. Susan Schommer
+## Tutoria 3: Serie de tempo (heterocedasticidade e autocorrelacao)
 
-# Tutoria Serie de tempo (heterocedasticidade e autocorrelacao)
-
-# Adaptado a partir de script elaborado por Ana Coelho 
+## Adaptado a partir de script elaborado por Ana Coelho 
 
 #####################################################################################################################
 

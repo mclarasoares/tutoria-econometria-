@@ -1,10 +1,10 @@
-############################### Econometria I#########################################################################
+##########################################################################################################
+#----------------------- TUTORIA - ECONOMETRIA I - PROF. SUSAN SCHOMMER ------------------------
+##########################################################################################################
 
-### Prof. Susan Schommer
+## Tutoria 4: Multicolinearidade 
 
-# Tutoria 4: Multicolinearidade 
-
-# Script elaborado a partir de: https://edisciplinas.usp.br/course/view.php?id=103117
+## Script elaborado a partir de: https://edisciplinas.usp.br/course/view.php?id=103117
 
 #####################################################################################################################
 
@@ -237,3 +237,5 @@ stargazer(reg1_2, reg2_2,reg3_2,reg4_2,
   ## Mas nao é uma medida indicativa de quais variaveis devem ou nao estar no modelo 
   ## Teste de significancia individual do coeficiente e teste F de significancia conjunta que devem indicar isso
   ## E tambem nao nos diz nada sobre causalidade (se x causa efeito em y): eletiva de microeconometria
+
+####################################################################################################################
